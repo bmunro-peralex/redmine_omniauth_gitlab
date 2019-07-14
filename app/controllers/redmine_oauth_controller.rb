@@ -1,12 +1,13 @@
 require 'account_controller'
 require 'json'
+require 'oauth2'
 
 class RedmineOauthController < AccountController
   include Helpers::MailHelper
   include Helpers::Checker
 
   def oauth_gitlab
-    if Setting.plugin_redmine_omniauth_gitlab[:oauth_authentification]
+    if Setting.plugin_redmine_omniauth_gitlab['oauth_authentification']
       session[:back_url] = params[:back_url]
       redirect_to oauth_client.auth_code.authorize_url(:redirect_uri => oauth_gitlab_callback_url)
     else
@@ -19,8 +20,8 @@ class RedmineOauthController < AccountController
       flash[:error] = l(:notice_access_denied)
       redirect_to signin_path
     else
-      token = oauth_client.auth_code.get_token(params[:code], :redirect_uri => oauth_gitlab_callback_url)
-      result = token.get( settings[:site]+'/api/v3/user')
+      token = oauth_client.auth_code.get_token(params['code'], :redirect_uri => oauth_gitlab_callback_url)
+      result = token.get( settings['site']+'/api/v3/user')
       info = JSON.parse(result.body)
       puts(info)
       puts("email : " + info["email"])
@@ -41,7 +42,11 @@ class RedmineOauthController < AccountController
   def try_to_login info
     params[:back_url] = session[:back_url]
     session.delete(:back_url)
-    user = User.joins(:email_addresses).where(:email_addresses => {:address => info["email"]}).first_or_create
+    if User.method_defined?(:email_addresses)
+      user = User.joins(:email_addresses).where(:email_addresses => { :address => info["email"] }).first_or_create
+    else
+      user = User.find_or_initialize_by(:mail => info["email"])
+    end
     if user.new_record?
       # Self-registration off
       redirect_to(home_url) && return unless Setting.self_registration?
@@ -85,11 +90,11 @@ class RedmineOauthController < AccountController
   end
 
   def oauth_client
-    @client ||= OAuth2::Client.new(settings[:client_id], settings[:client_secret],
+    @client ||= OAuth2::Client.new(settings['client_id'], settings['client_secret'],
                                    :token_method => :post,
-                                   :site => settings[:site],
-                                   :authorize_url => settings[:site] + '/oauth/authorize',
-                                   :token_url => settings[:site] + '/oauth/token'
+                                   :site => settings['site'],
+                                   :authorize_url => settings['site'] + '/oauth/authorize',
+                                   :token_url => settings['site'] + '/oauth/token'
     )
   end
 
