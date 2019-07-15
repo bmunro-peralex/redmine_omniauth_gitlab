@@ -16,27 +16,31 @@ bundle install
 ```
 
 Restart the redmine
+
 ```console
 /path/to/redmine/ctlscript.sh restart
 ```
 
 ### Registration
 
-To authenticate via gitlab you must first register your redmine instance via your gitlab
+To authenticate via gitlab you must first register your redmine instance via your gitlab.
+
+TODO: Set up on GitLab.
 
 ### Configuration
 
-* Login as a user with administrative privileges. 
+* Login as a user with administrative privileges.
 * In top menu select "Administration".
 * Click "Plugins"
 * In plugins list, click "Configure" in the row for "Redmine Omniauth gitlab plugin"
 * Enter the Сlient ID & Client Secret shown when you registered your application via gitlab Cloud Console.
 * Check the box near "Oauth authentication"
-* Click Apply. 
- 
+* Click Apply.
+
 Users can now to use their gitlab Account to log in to your instance of Redmine.
 
 Additionaly
+
 * Setup value Autologin in Settings on tab Authentification
 
 ### Other options
@@ -61,5 +65,6 @@ With the above configuration, only users with email addresses on the domains "on
 4. gitlab redirects user back to Redmine, where the gitlab OAuth plugin's controller takes over.
 
 One of the following cases will occur:
+
 1. If self-registration is enabled (Under Administration > Settings > Authentication), user is redirected to 'my/page'
 2. Otherwse, the an account is created for the user (referencing their gitlab OAuth2 ID). A Redmine administrator must activate the account for it to work.
