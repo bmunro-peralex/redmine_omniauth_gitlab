@@ -21,7 +21,7 @@ class RedmineOauthController < AccountController
       redirect_to signin_path
     else
       token = oauth_client.auth_code.get_token(params['code'], :redirect_uri => oauth_gitlab_callback_url)
-      result = token.get( settings['site']+'/api/v3/user')
+      result = token.get( settings['site']+'/api/v4/user')
       info = JSON.parse(result.body)
       puts(info)
       puts("email : " + info["email"])
